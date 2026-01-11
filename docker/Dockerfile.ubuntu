@@ -1,0 +1,46 @@
+# Ubuntu 22.04 LTS - Cross-distro test environment
+# Usage: docker build -f docker/Dockerfile.ubuntu -t velocity-test-ubuntu .
+#        docker run --rm -v $(pwd):/workspace velocity-test-ubuntu
+
+FROM ubuntu:22.04
+
+# Avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies for Tauri (headless testing only needs Rust)
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    libdbus-1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Set default toolchain
+RUN rustup default stable
+
+# Install clippy and rustfmt
+RUN rustup component add clippy rustfmt
+
+# Create a non-root user matching typical host user
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g ${GID} testuser && \
+    useradd -m -u ${UID} -g ${GID} testuser && \
+    cp -r /root/.cargo /home/testuser/.cargo && \
+    cp -r /root/.rustup /home/testuser/.rustup && \
+    chown -R testuser:testuser /home/testuser/.cargo /home/testuser/.rustup
+
+USER testuser
+ENV PATH="/home/testuser/.cargo/bin:${PATH}"
+ENV RUSTUP_HOME="/home/testuser/.rustup"
+ENV CARGO_HOME="/home/testuser/.cargo"
+
+WORKDIR /workspace/src-tauri
+
+# Default command runs full test suite in HEADLESS mode (no GUI deps)
+CMD ["sh", "-c", "echo '=== Ubuntu 22.04 ===' && cargo fmt --check && cargo clippy --lib --no-default-features --features headless -- -D warnings && cargo test --lib --no-default-features --features headless"]

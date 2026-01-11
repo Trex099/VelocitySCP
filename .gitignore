@@ -1,0 +1,79 @@
+# Velocity Console .gitignore
+
+# =========================
+# Node.js / Frontend
+# =========================
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# =========================
+# Rust / Tauri Backend
+# =========================
+src-tauri/target/
+**/*.rs.bk
+Cargo.lock
+
+# Tauri build artifacts
+src-tauri/gen/
+
+# =========================
+# Editor & IDE
+# =========================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =========================
+# Operating System
+# =========================
+.DS_Store
+Thumbs.db
+*~
+
+# =========================
+# Security - NEVER COMMIT
+# =========================
+# Private keys
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Credential files
+secrets/
+credentials/
+
+# =========================
+# Temporary & Cache
+# =========================
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+
+# =========================
+# Testing
+# =========================
+coverage/
+*.lcov
+

@@ -1,0 +1,44 @@
+# Arch Linux - Cross-distro test environment
+# Usage: docker build -f docker/Dockerfile.arch -t velocity-test-arch .
+#        docker run --rm -v $(pwd):/workspace:z velocity-test-arch
+
+FROM archlinux:latest
+
+# Update and install dependencies
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+    base-devel \
+    openssl \
+    dbus \
+    pkg-config \
+    curl && \
+    pacman -Scc --noconfirm
+
+# Install Rust via rustup (same as other distros for consistency)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Set default toolchain
+RUN rustup default stable
+
+# Install components
+RUN rustup component add clippy rustfmt
+
+# Create a non-root user matching typical host user
+ARG UID=1000
+ARG GID=1000
+RUN groupadd -g ${GID} testuser && \
+    useradd -m -u ${UID} -g ${GID} testuser && \
+    cp -r /root/.cargo /home/testuser/.cargo && \
+    cp -r /root/.rustup /home/testuser/.rustup && \
+    chown -R testuser:testuser /home/testuser/.cargo /home/testuser/.rustup
+
+USER testuser
+ENV PATH="/home/testuser/.cargo/bin:${PATH}"
+ENV RUSTUP_HOME="/home/testuser/.rustup"
+ENV CARGO_HOME="/home/testuser/.cargo"
+
+WORKDIR /workspace/src-tauri
+
+# Default command runs full test suite in HEADLESS mode (no GUI deps)
+CMD ["sh", "-c", "echo '=== Arch Linux ===' && cargo fmt --check && cargo clippy --lib --no-default-features --features headless -- -D warnings && cargo test --lib --no-default-features --features headless"]

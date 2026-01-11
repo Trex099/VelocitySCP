@@ -1,0 +1,12 @@
+# Velocity Console - Rust Formatting Configuration
+# Consistent formatting across all contributors
+
+edition = "2021"
+max_width = 100
+tab_spaces = 4
+use_small_heuristics = "Default"
+reorder_imports = true
+reorder_modules = true
+remove_nested_parens = true
+use_try_shorthand = true
+newline_style = "Unix"
