@@ -66,4 +66,5 @@ chrono = { version = "0.4", features = ["serde"] }
 which = "7"
 dirs = "6"
 
-
+# Database - SQLite with bundled library for cross-platform builds
+rusqlite = { version = "0.32", features = ["bundled"] }

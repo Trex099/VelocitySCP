@@ -2,11 +2,11 @@
 //!
 //! This module contains platform-specific abstractions and external integrations:
 //! - `platform`: Cross-distro path and terminal detection
-//! - `database`: `SQLite` ledger operations (via tauri-plugin-sql)
+//! - `database`: `SQLite` ledger operations
 //! - `credentials`: OS keyring integration
 
+pub mod database;
 pub mod platform;
 
-// These modules will be populated in later phases:
-// pub mod database;
+// This module will be populated in Phase 1.3:
 // pub mod credentials;
